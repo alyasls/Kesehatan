@@ -1775,27 +1775,56 @@
             }
         }
 
-        function playMusic(type) {
-            const musicTypes = {
-                rain: { name: 'Suara Hujan', emoji: '🌧️' },
-                ocean: { name: 'Suara Ombak', emoji: '🌊' },
-                forest: { name: 'Suara Hutan', emoji: '🌲' },
-                birds: { name: 'Kicau Burung', emoji: '🐦' }
-            };
-            
-            currentMusic = type;
-            const music = musicTypes[type];
-            document.getElementById('nowPlaying').textContent = `${music.emoji} ${music.name}`;
-            showPopup('🎵', 'Musik Diputar', `Sedang memutar: ${music.name}`);
-            
-            // Simulate playing music (in real app, you'd play actual audio)
-            console.log(`Playing ${music.name}`);
-        }
+        // Deklarasi objek audio global (taruh di tempat yang tadi dihapus)
+let audioObj = new Audio();
 
-        function stopMusic() {
-            currentMusic = null;
-            document.getElementById('nowPlaying').textContent = 'Tidak ada musik yang diputar';
-            showPopup('⏹️', 'Musik Dihentikan', 'Musik telah dihentikan');
+function playMusic(type) {
+    const musicData = {
+        rain: { 
+            name: 'Suara Hujan', 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' // Ganti dengan link mp3 hujan
+        },
+        ocean: { 
+            name: 'Suara Ombak', 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' 
+        },
+        forest: { 
+            name: 'Suara Hutan', 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' 
+        },
+        birds: { 
+            name: 'Kicau Burung', 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' 
+        }
+    };
+
+    const music = musicData[type];
+    
+    // Jika musik yang sama diklik, jangan mulai dari awal
+    if (currentMusic === type && !audioObj.paused) return;
+
+    // Berhenti dulu jika ada musik lain yang jalan
+    audioObj.pause();
+    
+    // Masukkan link musik dan mainkan
+    audioObj.src = music.url;
+    audioObj.loop = true; 
+    
+    audioObj.play().then(() => {
+        currentMusic = type;
+        document.getElementById('nowPlaying').textContent = `🎵 Memutar: ${music.name}`;
+        showPopup('🎵', 'Musik Diputar', `Sedang memutar: ${music.name}`);
+    }).catch(error => {
+        alert("Klik layar sekali lagi lalu coba putar musik (kebijakan privasi browser)");
+    });
+}
+
+function stopMusic() {
+    audioObj.pause();
+    audioObj.currentTime = 0;
+    currentMusic = null;
+    document.getElementById('nowPlaying').textContent = 'Tidak ada musik yang diputar';
+    showPopup('⏹️', 'Musik Dihentikan', 'Musik telah dihentikan');
         }
 
         // Avatar
